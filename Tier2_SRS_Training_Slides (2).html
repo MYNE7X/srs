@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0f766e" />
+<title>Temu Tier 2 Service Recovery — Training Slides & Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========== RESET & BASE ========== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal-900:#0f3a3a; --teal-700:#0f766e; --teal-500:#14b8a6; --teal-50:#f0fdfa;
+  --coral-500:#f97316; --coral-50:#fff7ed;
+  --amber-500:#f59e0b; --amber-50:#fffbeb;
+  --red-600:#dc2626; --red-100:#fee2e2;
+  --green-600:#16a34a; --green-100:#dcfce7;
+  --slate-900:#0f172a; --slate-700:#334155; --slate-500:#64748b; --slate-200:#e2e8f0; --slate-100:#f1f5f9; --slate-50:#f8fafc;
+  --white:#ffffff;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow:0 4px 16px rgba(15,23,42,.08);
+  --shadow-lg:0 12px 32px rgba(15,23,42,.12);
+  --radius-sm:10px; --radius:14px; --radius-lg:20px; --radius-xl:28px;
+  --font-display:'Plus Jakarta Sans',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+}
+html,body{height:100%}
+body{
+  font-family:var(--font-body);
+  color:var(--slate-900);
+  background:#0b1220;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  position:fixed;inset:0;
+  touch-action:pan-y;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* ========== APP LAYOUT ========== */
+#app{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  background:linear-gradient(135deg,#f0fdfa 0%,#fff7ed 50%,#fffbeb 100%);
+}
+
+/* ========== SLIDE STACK ========== */
+#slide-stack{
+  flex:1;position:relative;overflow:hidden;
+}
+.slide{
+  position:absolute;inset:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:env(safe-area-inset-top,12px) 18px env(safe-area-inset-bottom,12px) 18px;
+  padding-top:max(18px,env(safe-area-inset-top));
+  padding-bottom:max(90px,calc(env(safe-area-inset-bottom) + 90px));
+  opacity:0;visibility:hidden;
+  transform:translateX(40px);
+  transition:opacity .35s ease, transform .35s ease, visibility .35s;
+  display:flex;flex-direction:column;
+}
+.slide.active{opacity:1;visibility:visible;transform:translateX(0)}
+.slide.prev{transform:translateX(-40px)}
+
+/* Scrollbar styling */
+.slide::-webkit-scrollbar{width:6px}
+.slide::-webkit-scrollbar-track{background:transparent}
+.slide::-webkit-scrollbar-thumb{background:rgba(15,118,110,.2);border-radius:3px}
+
+/* ========== TYPOGRAPHY ========== */
+.eyebrow{
+  font-family:var(--font-display);
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--teal-700);
+  display:inline-flex;align-items:center;gap:6px;
+  margin-bottom:10px;
+}
+.eyebrow::before{
+  content:"";width:22px;height:2px;background:var(--coral-500);border-radius:2px;
+}
+h1.title{
+  font-family:var(--font-display);
+  font-size:clamp(26px,6.2vw,40px);
+  font-weight:800;line-height:1.08;letter-spacing:-.02em;
+  color:var(--slate-900);
+  margin-bottom:10px;
+}
+h2.subtitle{
+  font-family:var(--font-display);
+  font-size:clamp(20px,4.8vw,28px);
+  font-weight:700;line-height:1.15;letter-spacing:-.01em;
+  color:var(--slate-900);
+  margin-bottom:8px;
+}
+h3.section{
+  font-family:var(--font-display);
+  font-size:clamp(16px,4vw,20px);
+  font-weight:700;color:var(--slate-900);
+  margin-bottom:8px;
+}
+.lead{
+  font-size:clamp(14px,3.6vw,17px);
+  line-height:1.55;color:var(--slate-700);
+}
+p.body{font-size:clamp(13px,3.4vw,15px);line-height:1.6;color:var(--slate-700);margin-bottom:8px}
+.muted{color:var(--slate-500)}
+strong{color:var(--slate-900);font-weight:700}
+.tiny{font-size:11px;color:var(--slate-500);line-height:1.4}
+
+/* ========== COVER SLIDE ========== */
+.slide-cover{
+  background:
+    radial-gradient(ellipse at top left, rgba(20,184,166,.35), transparent 55%),
+    radial-gradient(ellipse at bottom right, rgba(249,115,22,.28), transparent 55%),
+    linear-gradient(135deg, #0a2e2e 0%, #0f766e 60%, #134e4a 100%);
+  color:#fff;
+  align-items:center;justify-content:center;text-align:center;
+  position:relative;
+}
+.slide-cover .badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.35);
+  backdrop-filter:blur(8px);
+  padding:9px 16px;border-radius:99px;
+  font-size:12.5px;font-weight:700;letter-spacing:.06em;
+  color:#ffffff;
+  margin-bottom:20px;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);
+}
+.slide-cover .badge svg{color:#fbbf24}
+.slide-cover h1{
+  font-family:var(--font-display);
+  font-size:clamp(28px,8vw,46px);
+  font-weight:800;line-height:1.05;letter-spacing:-.02em;
+  margin-bottom:12px;
+  color:#ffffff;
+  text-shadow:0 2px 24px rgba(0,0,0,.35);
+}
+.slide-cover h1 .accent{color:#fbbf24;display:block}
+.slide-cover .lead-text{
+  font-size:clamp(13px,3.6vw,16px);
+  color:#ffffff;
+  max-width:520px;line-height:1.55;
+  margin:0 auto 24px;
+  opacity:.92;
+}
+.slide-cover .meta{
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+}
+.slide-cover .meta-item{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.28);
+  padding:7px 12px;border-radius:99px;
+  font-size:11.5px;font-weight:600;color:#ffffff;
+  backdrop-filter:blur(6px);
+}
+.slide-cover .meta-item svg{width:13px;height:13px;color:#fbbf24}
+.slide-cover .corner-mark{
+  position:absolute;top:18px;right:18px;
+  font-family:var(--font-display);font-size:11px;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);
+  display:flex;align-items:center;gap:6px;
+}
+.slide-cover .corner-mark::before{
+  content:"";width:8px;height:8px;border-radius:50%;
+  background:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,.7);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+
+/* ========== TOC SLIDE ========== */
+.toc-grid{
+  display:grid;gap:10px;
+  grid-template-columns:1fr;
+  margin-top:14px;
+}
+@media(min-width:640px){.toc-grid{grid-template-columns:1fr 1fr}}
+.toc-item{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:14px;border-radius:var(--radius);
+  background:#fff;
+  border:1px solid var(--slate-200);
+  box-shadow:var(--shadow-sm);
+}
+.toc-num{
+  flex-shrink:0;width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--teal-700),var(--teal-500));
+  color:#fff;font-weight:800;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);
+}
+.toc-text h4{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:2px}
+.toc-text p{font-size:11.5px;color:var(--slate-500);line-height:1.45}
+
+/* ========== SECTION DIVIDER ========== */
+.slide-section{
+  background:linear-gradient(135deg,#0f3a3a 0%, #0f766e 100%);
+  color:#fff;
+  align-items:center;justify-content:center;text-align:center;
+}
+.slide-section .big-num{
+  font-family:var(--font-display);
+  font-size:clamp(70px,18vw,140px);
+  font-weight:800;line-height:1;color:rgba(251,191,36,.22);
+  margin-bottom:-20px;
+}
+.slide-section .label{
+  font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:#fbbf24;margin-bottom:8px;
+}
+.slide-section h1{
+  font-family:var(--font-display);
+  font-size:clamp(24px,6.5vw,38px);
+  font-weight:800;line-height:1.1;letter-spacing:-.02em;
+  margin-bottom:12px;
+  color:#ffffff;
+  text-shadow:0 2px 18px rgba(0,0,0,.3);
+}
+.slide-section h1 .accent{color:#fbbf24}
+.slide-section .desc{
+  font-size:clamp(13px,3.6vw,16px);color:#e0fbf6;
+  max-width:480px;line-height:1.6;
+}
+
+/* ========== CARDS ========== */
+.card{
+  background:#fff;border-radius:var(--radius-lg);
+  padding:16px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--slate-200);
+}
+.card-soft{
+  background:var(--slate-50);
+  border-radius:var(--radius);
+  padding:14px;
+  border:1px solid var(--slate-200);
+}
+.card-teal{
+  background:linear-gradient(135deg,var(--teal-50),#fff);
+  border-left:4px solid var(--teal-500);
+  border-radius:var(--radius);
+  padding:14px;
+}
+.card-coral{
+  background:linear-gradient(135deg,var(--coral-50),#fff);
+  border-left:4px solid var(--coral-500);
+  border-radius:var(--radius);
+  padding:14px;
+}
+.card-amber{
+  background:linear-gradient(135deg,var(--amber-50),#fff);
+  border-left:4px solid var(--amber-500);
+  border-radius:var(--radius);
+  padding:14px;
+}
+
+/* Risk level chips */
+.risk-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:99px;
+  font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  white-space:nowrap;
+}
+.risk-high{background:var(--red-100);color:var(--red-600)}
+.risk-med{background:var(--amber-50);color:#b45309}
+.risk-low{background:var(--green-100);color:var(--green-600)}
+
+/* Grid helpers */
+.grid-2{display:grid;gap:10px;grid-template-columns:1fr;margin-top:10px}
+@media(min-width:640px){.grid-2{grid-template-columns:1fr 1fr}}
+.grid-3{display:grid;gap:10px;grid-template-columns:1fr;margin-top:10px}
+@media(min-width:720px){.grid-3{grid-template-columns:1fr 1fr 1fr}}
+
+/* Quote / customer example */
+.quote{
+  background:#fff;border-radius:var(--radius);
+  padding:14px 16px 14px 50px;position:relative;
+  border:1px solid var(--slate-200);
+  box-shadow:var(--shadow-sm);
+  font-size:13.5px;line-height:1.55;color:var(--slate-700);
+  font-style:italic;
+}
+.quote::before{
+  content:"\201C";position:absolute;left:14px;top:6px;
+  font-family:Georgia,serif;font-size:46px;color:var(--coral-500);line-height:1;
+}
+.answer{
+  margin-top:10px;display:flex;align-items:center;gap:8px;
+  background:var(--green-100);color:#14532d;
+  padding:10px 12px;border-radius:var(--radius);
+  font-size:13px;font-weight:600;
+}
+.answer svg{width:18px;height:18px;flex-shrink:0}
+
+/* Tag list */
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:#fff;border:1px solid var(--slate-200);
+  padding:6px 10px;border-radius:99px;
+  font-size:11.5px;font-weight:600;color:var(--slate-700);
+  box-shadow:var(--shadow-sm);
+}
+.tag .dot{width:8px;height:8px;border-radius:50%}
+
+/* Bullet list */
+.bullets{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.bullets li{
+  position:relative;padding-left:24px;
+  font-size:13.5px;line-height:1.55;color:var(--slate-700);
+}
+.bullets li::before{
+  content:"";position:absolute;left:6px;top:8px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--coral-500);
+}
+.bullets.check li::before{
+  content:"\2713";background:transparent;color:var(--green-600);
+  font-weight:800;font-size:14px;left:0;top:5px;
+}
+.bullets.x li::before{
+  content:"\2715";background:transparent;color:var(--red-600);
+  font-weight:800;font-size:13px;left:0;top:5px;
+}
+
+/* Numbered steps */
+.steps{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.step{
+  display:flex;gap:10px;align-items:flex-start;
+  background:#fff;border:1px solid var(--slate-200);
+  border-radius:var(--radius);padding:10px 12px;
+  box-shadow:var(--shadow-sm);
+}
+.step-num{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;
+  background:var(--teal-700);color:#fff;
+  font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);
+}
+.step-text{font-size:13px;line-height:1.5;color:var(--slate-700)}
+
+/* Comparison columns */
+.compare{display:grid;gap:10px;grid-template-columns:1fr;margin-top:10px}
+@media(min-width:640px){.compare{grid-template-columns:1fr 1fr}}
+.compare-col{
+  background:#fff;border-radius:var(--radius);padding:12px;
+  border:1px solid var(--slate-200);box-shadow:var(--shadow-sm);
+}
+.compare-col h4{
+  font-family:var(--font-display);font-size:13px;font-weight:700;
+  color:var(--slate-900);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+
+/* Tables (responsive) */
+.t-row{
+  display:grid;gap:1px;background:var(--slate-200);
+  border-radius:var(--radius);overflow:hidden;
+  border:1px solid var(--slate-200);
+  margin-top:10px;
+}
+.t-cell{
+  background:#fff;padding:10px 12px;
+  font-size:12.5px;line-height:1.45;color:var(--slate-700);
+}
+.t-cell.head{
+  background:var(--teal-700);color:#fff;font-weight:700;
+  font-family:var(--font-display);font-size:12px;
+}
+
+/* ========== BOTTOM NAV BAR ========== */
+#nav-bar{
+  position:fixed;left:0;right:0;bottom:0;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(14px);
+  border-top:1px solid var(--slate-200);
+  padding:10px 16px max(10px,env(safe-area-inset-bottom)) 16px;
+  display:flex;align-items:center;gap:10px;
+  z-index:50;
+}
+#prev-btn,#next-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:var(--slate-900);color:#fff;
+  padding:11px 16px;border-radius:99px;
+  font-size:13.5px;font-weight:600;
+  font-family:var(--font-display);
+  transition:transform .15s, background .2s;
+  min-height:42px;
+}
+#prev-btn:active,#next-btn:active{transform:scale(.96)}
+#prev-btn{background:var(--slate-100);color:var(--slate-700)}
+#next-btn{background:var(--teal-700);color:#fff}
+#prev-btn:disabled{opacity:.35;cursor:not-allowed}
+#next-btn:disabled{opacity:.35}
+#prev-btn svg,#next-btn svg{width:16px;height:16px}
+#progress-wrap{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+#progress-bar{
+  width:100%;height:5px;background:var(--slate-200);
+  border-radius:99px;overflow:hidden;
+}
+#progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--teal-500),var(--coral-500));
+  width:0;transition:width .35s ease;border-radius:99px;
+}
+#slide-counter{
+  font-family:var(--font-display);font-size:11px;font-weight:700;
+  color:var(--slate-500);letter-spacing:.04em;
+}
+#slide-counter b{color:var(--teal-700)}
+
+/* Slide indicator dots */
+.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:8px;max-width:140px}
+.dot-btn{
+  width:6px;height:6px;border-radius:50%;background:var(--slate-300);
+  transition:all .2s;
+}
+.dot-btn.active{background:var(--teal-700);transform:scale(1.4)}
+
+/* ========== QUIZ ========== */
+.quiz-question{
+  font-family:var(--font-display);
+  font-size:clamp(15px,4.2vw,19px);
+  font-weight:700;line-height:1.35;color:var(--slate-900);
+  margin-bottom:6px;
+}
+.quiz-context{
+  font-size:12.5px;color:var(--slate-500);margin-bottom:12px;
+  font-style:italic;line-height:1.5;
+}
+.quiz-options{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.quiz-opt{
+  display:flex;align-items:flex-start;gap:10px;
+  background:#fff;border:2px solid var(--slate-200);
+  padding:12px 14px;border-radius:var(--radius);
+  font-size:13.5px;line-height:1.5;color:var(--slate-700);
+  transition:all .15s;
+  text-align:left;
+  width:100%;
+  min-height:48px;
+}
+.quiz-opt:active{transform:scale(.98)}
+.quiz-opt .opt-letter{
+  flex-shrink:0;width:26px;height:26px;border-radius:8px;
+  background:var(--slate-100);color:var(--slate-700);
+  font-weight:800;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);
+  transition:all .15s;
+}
+.quiz-opt:hover{border-color:var(--teal-500)}
+.quiz-opt.correct{
+  border-color:var(--green-600);background:var(--green-100);
+  color:#14532d;
+}
+.quiz-opt.correct .opt-letter{background:var(--green-600);color:#fff}
+.quiz-opt.wrong{
+  border-color:var(--red-600);background:var(--red-100);
+  color:#7f1d1d;
+}
+.quiz-opt.wrong .opt-letter{background:var(--red-600);color:#fff}
+.quiz-opt:disabled{cursor:default}
+.quiz-feedback{
+  margin-top:12px;padding:12px;border-radius:var(--radius);
+  font-size:13px;line-height:1.55;
+  display:none;
+}
+.quiz-feedback.show{display:block;animation:fadeIn .3s}
+.quiz-feedback.ok{background:var(--green-100);color:#14532d;border:1px solid var(--green-600)}
+.quiz-feedback.no{background:var(--amber-50);color:#92400e;border:1px solid var(--amber-500)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Quiz result slide */
+.result-score{
+  font-family:var(--font-display);
+  font-size:clamp(48px,14vw,80px);
+  font-weight:800;line-height:1;
+  background:linear-gradient(135deg,var(--teal-700),var(--coral-500));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.result-ring{
+  width:140px;height:140px;border-radius:50%;
+  background:conic-gradient(var(--teal-500) var(--p,0%), var(--slate-200) 0);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;
+  position:relative;
+}
+.result-ring::before{
+  content:"";position:absolute;inset:8px;background:#fff;border-radius:50%;
+}
+.result-ring span{
+  position:relative;font-family:var(--font-display);
+  font-size:32px;font-weight:800;color:var(--slate-900);
+}
+.result-msg{
+  font-size:14px;color:var(--slate-700);line-height:1.55;
+  text-align:center;max-width:420px;margin:0 auto 18px;
+}
+.result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 18px;border-radius:99px;
+  font-family:var(--font-display);font-size:13.5px;font-weight:600;
+  transition:transform .15s;
+}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--teal-700);color:#fff}
+.btn-secondary{background:var(--slate-100);color:var(--slate-700)}
+
+/* Utility */
+.flex{display:flex}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.gap-sm{gap:6px}
+.center{align-items:center;justify-content:center}
+.col{display:flex;flex-direction:column}
+.mt-8{margin-top:8px}
+.mt-12{margin-top:12px}
+.mt-16{margin-top:16px}
+.mb-8{margin-bottom:8px}
+.text-c{text-align:center}
+.full{flex:1}
+
+/* Highlight box */
+.highlight{
+  background:linear-gradient(135deg,var(--amber-50),var(--coral-50));
+  border-radius:var(--radius);padding:12px 14px;
+  border:1px dashed var(--coral-500);
+  font-size:13px;line-height:1.55;color:var(--slate-700);
+  margin-top:10px;
+}
+.highlight b{color:#9a3412}
+
+/* Priority chain visualization */
+.chain{
+  display:flex;flex-direction:column;gap:6px;margin-top:10px;
+}
+.chain-row{
+  display:flex;align-items:center;gap:8px;
+  background:#fff;border:1px solid var(--slate-200);
+  border-radius:var(--radius);padding:8px 10px;
+  font-size:12px;
+  box-shadow:var(--shadow-sm);
+}
+.chain-row .num{
+  width:22px;height:22px;border-radius:6px;
+  background:var(--teal-700);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:11px;font-family:var(--font-display);
+  flex-shrink:0;
+}
+.chain-arrow{
+  text-align:center;color:var(--coral-500);font-size:18px;font-weight:700;
+  line-height:1;
+}
+
+/* Small responsive fixes for tiny screens */
+@media(max-width:360px){
+  .slide{padding-left:14px;padding-right:14px}
+  h1.title{font-size:23px}
+  .quiz-question{font-size:14px}
+}
+
+/* Slide title row */
+.slide-head{
+  display:flex;align-items:flex-start;gap:10px;
+  margin-bottom:12px;
+}
+.slide-head .icon-box{
+  flex-shrink:0;width:40px;height:40px;border-radius:12px;
+  background:linear-gradient(135deg,var(--teal-700),var(--teal-500));
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 10px rgba(15,118,110,.25);
+}
+.slide-head .icon-box svg{width:22px;height:22px}
+.slide-head .icon-box.coral{background:linear-gradient(135deg,var(--coral-500),#fb923c)}
+.slide-head .icon-box.amber{background:linear-gradient(135deg,var(--amber-500),#fbbf24)}
+.slide-head .icon-box.red{background:linear-gradient(135deg,#dc2626,#ef4444)}
+.slide-head .icon-box.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+.slide-head .icon-box.slate{background:linear-gradient(135deg,#475569,#64748b)}
+
+/* Vertical flow for arrow steps */
+.flow{
+  display:flex;flex-direction:column;gap:0;margin-top:10px;
+}
+.flow-step{
+  background:#fff;border:1px solid var(--slate-200);
+  padding:10px 12px 10px 14px;border-radius:var(--radius);
+  font-size:13px;line-height:1.5;color:var(--slate-700);
+  position:relative;
+  box-shadow:var(--shadow-sm);
+  border-left:4px solid var(--teal-500);
+}
+.flow-step + .flow-step{margin-top:6px}
+.flow-step b{color:var(--slate-900)}
+
+/* Risk level visual ladder */
+.ladder{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px;
+}
+.ladder-item{
+  padding:10px 8px;border-radius:var(--radius);
+  text-align:center;
+  border:1px solid var(--slate-200);
+  background:#fff;
+  box-shadow:var(--shadow-sm);
+}
+.ladder-item.high{background:var(--red-100);border-color:var(--red-600)}
+.ladder-item.med{background:var(--amber-50);border-color:var(--amber-500)}
+.ladder-item.low{background:var(--green-100);border-color:var(--green-600)}
+.ladder-item .lbl{
+  font-family:var(--font-display);
+  font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  margin-bottom:4px;
+}
+.ladder-item.high .lbl{color:var(--red-600)}
+.ladder-item.med .lbl{color:#b45309}
+.ladder-item.low .lbl{color:var(--green-600)}
+.ladder-item .desc{font-size:11px;line-height:1.4;color:var(--slate-700)}
+
+/* Identity grid */
+.id-grid{display:grid;gap:8px;grid-template-columns:1fr 1fr;margin-top:10px}
+@media(min-width:560px){.id-grid{grid-template-columns:1fr 1fr 1fr}}
+.id-card{
+  background:#fff;border:1px solid var(--slate-200);
+  border-radius:var(--radius);padding:12px;
+  text-align:center;
+  box-shadow:var(--shadow-sm);
+}
+.id-card .ico{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--teal-50);color:var(--teal-700);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 6px;
+}
+.id-card .ico svg{width:20px;height:20px}
+.id-card h5{font-family:var(--font-display);font-size:12.5px;font-weight:700;color:var(--slate-900)}
+.id-card p{font-size:10.5px;color:var(--slate-500);line-height:1.4;margin-top:2px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="slide-stack">
+
+    <!-- ============ SLIDE 1: COVER ============ -->
+    <section class="slide slide-cover active" data-slide="1">
+      <div class="corner-mark">Temu · Tier 2</div>
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Tier 2 Training
+      </div>
+      <h1>Service Recovery<br><span class="accent">Skill Group</span></h1>
+      <p class="lead-text">A simple, friendly guide to handling sensitive cases — labels, SOPs, complicated situations, and a quiz at the end to test what you learned.</p>
+      <div class="meta">
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ~25 min read
+        </div>
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          5 Parts
+        </div>
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          + Quiz
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 2: TOC ============ -->
+    <section class="slide" data-slide="2">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+        <div>
+          <div class="eyebrow">What you'll learn</div>
+          <h2 class="subtitle">Course Roadmap</h2>
+        </div>
+      </div>
+      <p class="lead">Five short parts. Each one teaches a real skill you'll use every day on Tier 2 tickets.</p>
+      <div class="toc-grid">
+        <div class="toc-item"><div class="toc-num">1</div><div class="toc-text"><h4>Problem Additional Impact Labels</h4><p>Ethics, sensitive ID, legal action, injury, property damage, external complaints</p></div></div>
+        <div class="toc-item"><div class="toc-num">2</div><div class="toc-text"><h4>SRS Skill Group Intro</h4><p>Which cases come to us, plus how to spot official & org complaint emails</p></div></div>
+        <div class="toc-item"><div class="toc-num">3</div><div class="toc-text"><h4>Handle Complicated Situations</h4><p>Return labels, account & payment issues, reporting CS / sellers</p></div></div>
+        <div class="toc-item"><div class="toc-num">4</div><div class="toc-text"><h4>Processing SOP</h4><p>Receive cases, stuck points, locate issues, close tickets</p></div></div>
+        <div class="toc-item"><div class="toc-num">5</div><div class="toc-text"><h4>Case Analysis</h4><p>Real-world example: CEO escalation with multiple issues</p></div></div>
+        <div class="toc-item"><div class="toc-num">Q</div><div class="toc-text"><h4>Final Quiz</h4><p>15 questions to test your understanding</p></div></div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 3: PART 1 DIVIDER ============ -->
+    <section class="slide slide-section" data-slide="3">
+      <div class="big-num">01</div>
+      <div class="label">Part One</div>
+      <h1>Problem Additional<br><span class="accent">Impact Labels</span></h1>
+      <p class="desc">Temu needs to know about risky or sensitive cases. You tag them with the right label so the company can act fast. Trust the customer — even without proof.</p>
+    </section>
+
+    <!-- ============ SLIDE 4: WHY LABELS MATTER ============ -->
+    <section class="slide" data-slide="4">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg></div>
+        <div>
+          <div class="eyebrow">The big picture</div>
+          <h2 class="subtitle">Why Labels Matter</h2>
+        </div>
+      </div>
+      <p class="body">Some cases are <strong>highly sensitive or risky</strong> — like lawsuits, injuries, or media threats. Temu has a built-in label tool on the workbench (chat, hotline, ticket agents all use it).</p>
+      <div class="card-teal mt-8">
+        <p class="body" style="margin-bottom:0"><strong>Simple rule:</strong> If something in the case matches a label's definition, you <strong>must</strong> tag it — even if it later gets resolved.</p>
+      </div>
+      <div class="grid-2 mt-12">
+        <div class="card-soft">
+          <h3 class="section" style="font-size:14px">Trust the customer</h3>
+          <p class="body" style="margin-bottom:0">Whether or not a high-risk claim can be verified, accept it as true and tag accordingly.</p>
+        </div>
+        <div class="card-soft">
+          <h3 class="section" style="font-size:14px">Don't ask for proof</h3>
+          <p class="body" style="margin-bottom:0">Never proactively ask the user for evidence — unless KB, Paoding, or Q&A coaches require it.</p>
+        </div>
+      </div>
+      <div class="highlight">
+        <b>Remember:</b> The label tells Temu "this case is risky." It does NOT mean you skip helping the customer. Always follow user-centered service.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 5: ETHICS & CRIMES ============ -->
+    <section class="slide" data-slide="5">
+      <div class="slide-head">
+        <div class="icon-box red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1L3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div>
+          <div class="eyebrow">Label 1 of 6</div>
+          <h2 class="subtitle">Ethics &amp; Crimes</h2>
+        </div>
+      </div>
+      <p class="body">The user mentions a <strong>crime</strong> or an act related to <strong>ethics and morals</strong> during the session.</p>
+      <div class="grid-3 mt-8">
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Child Porn</h3>
+          <p class="tiny">Any mention of child sexual abuse material — always tag, never ask for proof.</p>
+        </div>
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Drug Issues</h3>
+          <p class="tiny">Drugs, trafficking, or selling banned substances mentioned by the customer.</p>
+        </div>
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Personal Safety</h3>
+          <p class="tiny">Murder, kidnapping, robbery, human trafficking — threats to a person's life.</p>
+        </div>
+      </div>
+      <div class="card-coral mt-12">
+        <h3 class="section" style="font-size:14px">Case Example</h3>
+        <div class="quote mt-8">If you don't give me the refund, my husband will kill me! I'll really be dead!</div>
+        <div class="answer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Correct label: <strong>Ethics &amp; Crimes</strong> — Personal safety issue (threat to life)</div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 6: SENSITIVE IDENTITY ============ -->
+    <section class="slide" data-slide="6">
+      <div class="slide-head">
+        <div class="icon-box amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <div>
+          <div class="eyebrow">Label 2 of 6</div>
+          <h2 class="subtitle">Sensitive Identity Inquiry</h2>
+        </div>
+      </div>
+      <p class="body">Users from these groups contact CS to declare issues <strong>on behalf of an organization or individual</strong>.</p>
+      <div class="id-grid">
+        <div class="id-card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L4 9v12h16V9z"/><path d="M9 22V12h6v10"/></svg></div><h5>Lawyer</h5></div>
+        <div class="id-card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22V4a2 2 0 012-2h12a2 2 0 012 2v18"/><path d="M4 22h16"/><path d="M9 8h6"/></svg></div><h5>Media / Journalist</h5></div>
+        <div class="id-card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8"/></svg></div><h5>Celebrity / KOL</h5></div>
+        <div class="id-card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></div><h5>Gov / Legal Authority</h5></div>
+        <div class="id-card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/></svg></div><h5>Legal Guardian</h5></div>
+      </div>
+      <div class="card-amber mt-12">
+        <p class="body" style="margin-bottom:6px"><strong>Important:</strong> Tag must be applied regardless of whether the user is an <strong>active employee or former</strong> employee.</p>
+        <div class="quote mt-8" style="margin-top:8px">I am a lawyer and a law professor. I'll file charges against Temu for stealing my money if you don't give me a refund.</div>
+        <div class="answer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Sensitive identity — <strong>Lawyer inquiry</strong></div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 7: FINED OR SUED ============ -->
+    <section class="slide" data-slide="7">
+      <div class="slide-head">
+        <div class="icon-box slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l9 6 9-6"/><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10l9 6 9-6"/></svg></div>
+        <div>
+          <div class="eyebrow">Label 3 of 6</div>
+          <h2 class="subtitle">Fined or Sued Due to Temu</h2>
+        </div>
+      </div>
+      <p class="body">The user says they <strong>got fined or sued because of Temu</strong>. Common reasons:</p>
+      <div class="tag-list">
+        <span class="tag"><span class="dot" style="background:var(--coral-500)"></span> Product infringement</span>
+        <span class="tag"><span class="dot" style="background:var(--coral-500)"></span> Bought banned items</span>
+        <span class="tag"><span class="dot" style="background:var(--coral-500)"></span> Items that don't meet regulations</span>
+      </div>
+      <div class="card-coral mt-12">
+        <h3 class="section" style="font-size:14px">Quick examples</h3>
+        <ul class="bullets mt-8">
+          <li>"Customs fined me $500 because the product I bought from Temu was banned."</li>
+          <li>"I got sued because the item I resold was a trademark infringement."</li>
+          <li>"The local authority fined me because the product didn't meet safety rules."</li>
+        </ul>
+      </div>
+      <div class="highlight">
+        <b>Key point:</b> The fine or lawsuit must be caused by Temu's product, service, or merchant — not an unrelated issue. Trust the customer's claim.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 8: LEGAL ACTION / GOV ============ -->
+    <section class="slide" data-slide="8">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M3 21h18"/><path d="M7 12h10"/></svg></div>
+        <div>
+          <div class="eyebrow">Label 4 of 6</div>
+          <h2 class="subtitle">Legal Action / Gov Complaint</h2>
+        </div>
+      </div>
+      <p class="body">The user has <strong>resolved or intends to resolve</strong> the issue through public authorities (government, regulatory, judicial, or law enforcement).</p>
+      <div class="ladder">
+        <div class="ladder-item high">
+          <div class="lbl">High Risk</div>
+          <div class="desc">Mentions <strong>specific authorities</strong>, has <strong>clear timelines</strong>, <strong>supporting evidence</strong> (receipts, case numbers, emails), <strong>formal legal docs</strong></div>
+        </div>
+        <div class="ladder-item med">
+          <div class="lbl">Medium Risk</div>
+          <div class="desc">Only expresses intention to seek help from authorities — without specific details, evidence, or timelines</div>
+        </div>
+      </div>
+      <div class="card-teal mt-12">
+        <h3 class="section" style="font-size:14px">Upgrade Rule</h3>
+        <p class="body" style="margin-bottom:0">In <strong>medium risk</strong> cases, upgrade to <strong>high risk</strong> if the customer also requests Temu company information (legal representative, registered address, etc.).</p>
+      </div>
+      <div class="grid-2 mt-12">
+        <div class="card-coral">
+          <span class="risk-chip risk-high">High Risk</span>
+          <div class="quote mt-8" style="margin-top:8px">I told you I called the police yesterday! Here's my police record. I just want my money back!</div>
+        </div>
+        <div class="card-coral">
+          <span class="risk-chip risk-med">Medium Risk</span>
+          <div class="quote mt-8" style="margin-top:8px">I'll get a lawyer.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 9: HUMAN INJURY ============ -->
+    <section class="slide" data-slide="9">
+      <div class="slide-head">
+        <div class="icon-box red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+        <div>
+          <div class="eyebrow">Label 5 of 6</div>
+          <h2 class="subtitle">Human Injury</h2>
+        </div>
+      </div>
+      <p class="body">The user has experienced <strong>injuries or severe illness</strong> due to Temu — directly or indirectly. <strong>Suicide or self-harm</strong> due to Temu also counts as human injury.</p>
+      <div class="ladder">
+        <div class="ladder-item high">
+          <div class="lbl">High Risk</div>
+          <div class="desc">Death, hospitalization, miscarriage, self-harm/suicide <strong>with supporting evidence</strong> (medical records, police reports, photos, third-party docs)</div>
+        </div>
+        <div class="ladder-item med">
+          <div class="lbl">Medium Risk</div>
+          <div class="desc">Physical injury or health issues that don't meet the high-risk threshold, OR self-harm/suicide expressions <strong>without supporting evidence</strong></div>
+        </div>
+      </div>
+      <div class="card-teal mt-12">
+        <h3 class="section" style="font-size:13px">Upgrade to High Risk if any apply:</h3>
+        <ul class="bullets mt-8" style="margin-top:6px">
+          <li>Person has <strong>sensitive identity</strong> (elderly, children, pregnant, disabled, serious health issues)</li>
+          <li>Customer <strong>also filed/intends to file</strong> gov complaints or legal action</li>
+          <li>Customer <strong>shows intent for external complaint</strong> (non-government)</li>
+        </ul>
+      </div>
+      <div class="highlight">
+        <b>What counts as "substantial impact":</b> Visible damage (skin breakdown, redness, swelling), illness (nausea, dizziness, allergies, psychological issues). Discomfort alone is NOT human injury.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 10: PROPERTY DAMAGE ============ -->
+    <section class="slide" data-slide="10">
+      <div class="slide-head">
+        <div class="icon-box amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
+        <div>
+          <div class="eyebrow">Label 6 of 6</div>
+          <h2 class="subtitle">Property Damage</h2>
+        </div>
+      </div>
+      <p class="body">The user experienced <strong>property damage</strong> due to Temu issues — directly or indirectly. Usually refers to damage of the customer's <strong>private property</strong>.</p>
+      <div class="ladder">
+        <div class="ladder-item high">
+          <div class="lbl">High Risk</div>
+          <div class="desc">Claimed amount is <strong>≥ USD 600</strong></div>
+        </div>
+        <div class="ladder-item med">
+          <div class="lbl">Medium Risk</div>
+          <div class="desc">Claimed amount is <strong>&lt; USD 600</strong> / no specified amount</div>
+        </div>
+        <div class="ladder-item low" style="background:#f1f5f9;border-color:var(--slate-200)">
+          <div class="lbl" style="color:var(--slate-500)">Upgrade if…</div>
+          <div class="desc">Sensitive identity, gov complaint, OR external complaint intent</div>
+        </div>
+      </div>
+      <div class="card-amber mt-12">
+        <h3 class="section" style="font-size:13px">Is it property damage? (Yes / No)</h3>
+        <ul class="bullets x mt-8" style="margin-top:6px">
+          <li><strong>Headphone broken?</strong> No — only the Temu product itself, not other property.</li>
+          <li><strong>Shoes uncomfortable?</strong> No — discomfort is subjective, not injury.</li>
+          <li><strong>Leaking pen stained other items in same package?</strong> No — those items are all from Temu in one shipment, so it's an after-sales "product damaged" case.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 11: EXTERNAL COMPLAINT ============ -->
+    <section class="slide" data-slide="11">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div>
+          <div class="eyebrow">Label 6 — non-gov</div>
+          <h2 class="subtitle">External Complaint (Non-Gov)</h2>
+        </div>
+      </div>
+      <p class="body">The user intends to submit / has submitted a complaint or exposure material — and may provide evidence or timelines.</p>
+      <div class="ladder">
+        <div class="ladder-item high">
+          <div class="lbl">High Risk</div>
+          <div class="desc">Submitted complaint to <strong>high-impact external channel</strong> (TV, newspaper, executive, KOL) <strong>with supporting evidence</strong></div>
+        </div>
+        <div class="ladder-item med">
+          <div class="lbl">Medium Risk</div>
+          <div class="desc">Submitted complaint to high-impact channel but <strong>no evidence</strong>, OR intention to a <strong>specific channel</strong>, OR no channel but <strong>clear timeline</strong></div>
+        </div>
+        <div class="ladder-item low">
+          <div class="lbl">Low Risk</div>
+          <div class="desc">General intention, <strong>no specific channel</strong>, no clear timeline</div>
+        </div>
+      </div>
+      <div class="card-coral mt-12">
+        <h3 class="section" style="font-size:13px">Upgrade &amp; Downgrade rules</h3>
+        <ul class="bullets mt-8" style="margin-top:6px">
+          <li><strong>Upgrade:</strong> Traditional media (TV, newspaper) carry higher risk than low-sensitivity platforms → upgrade to high risk.</li>
+          <li><strong>Downgrade:</strong> Lower-sensitivity platforms (social media, BBB, Trustpilot) → downgrade to low risk, even with evidence.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 12: PRIORITY ORDER ============ -->
+    <section class="slide" data-slide="12">
+      <div class="slide-head">
+        <div class="icon-box amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <div>
+          <div class="eyebrow">Tagging rules</div>
+          <h2 class="subtitle">Priority &amp; Combo Rules</h2>
+        </div>
+      </div>
+      <p class="body">When <strong>multiple sensitive issues</strong> appear in one case, follow this priority order (lowest → highest):</p>
+      <div class="chain mt-8">
+        <div class="chain-row"><span class="num">1</span> External complaint (non-gov)</div>
+        <div class="chain-arrow">↑</div>
+        <div class="chain-row"><span class="num">2</span> Legal action / complaint to gov authorities</div>
+        <div class="chain-arrow">↑</div>
+        <div class="chain-row"><span class="num">3</span> Fined or sued due to Temu issues</div>
+        <div class="chain-arrow">↑</div>
+        <div class="chain-row"><span class="num">4</span> Sensitive identity inquiry</div>
+        <div class="chain-arrow">↑</div>
+        <div class="chain-row"><span class="num">5</span> Ethics &amp; Crimes</div>
+      </div>
+      <div class="card-teal mt-12">
+        <h3 class="section" style="font-size:13px">Special priority notes</h3>
+        <ul class="bullets mt-8" style="margin-top:6px">
+          <li>If case involves <strong>Human Injury OR Property Damage</strong> + another sensitive issue → use the <strong>"Human injury / Property damage"</strong> label.</li>
+          <li>If both <strong>human injury AND property damage</strong> → use the <strong>"Human injury"</strong> label.</li>
+          <li><strong>Medium-risk legal action + high-risk external complaint</strong> → label as <strong>external complaint (non-gov) high risk</strong>.</li>
+          <li><strong>High-risk legal action + high-risk external complaint</strong> → label as <strong>legal action (gov) high risk</strong>.</li>
+        </ul>
+      </div>
+      <div class="highlight">
+        <b>Rule of thumb:</b> Always trust the customer's claim. If a high-sensitivity issue is mentioned at any point in the chat, review the whole interaction and apply the right tag — even if the issue is later resolved.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 13: HANDLING EXTERNAL COMPLAINTS ============ -->
+    <section class="slide" data-slide="13">
+      <div class="slide-head">
+        <div class="icon-box coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
+        <div>
+          <div class="eyebrow">External complaints</div>
+          <h2 class="subtitle">Handling Process</h2>
+        </div>
+      </div>
+      <div class="flow">
+        <div class="flow-step"><b>Step 1 — Definition.</b> The customer claims they used / will use non-Temu channels to complain or spread negative info that harms Temu's reputation. Includes: gov/legal complaints, external high-impact channels (media, social, execs), or family/friend with special identity (lawyer, journalist, influencer).</div>
+        <div class="flow-step"><b>Step 2 — Identify the customer.</b> If they state a sensitive identity, modify the additional label. If reporting to Q&A coach is needed, use TPD keyword <b>"External complaint or legal action"</b>. Regular customers follow normal SOP.</div>
+        <div class="flow-step"><b>Step 3 — Did the complaint already occur?</b> If they clearly state they've already acted → <b>"Already occurred"</b>. Everything else → <b>"Not yet occurred"</b>.</div>
+        <div class="flow-step"><b>Step 3.1 — Already occurred.</b> Modify label, report to Q&A coach with TPD keyword if needed.</div>
+        <div class="flow-step"><b>Step 3.2 — Not yet occurred.</b> Try to resolve per KB. If after your solution the customer mentions external complaint again, treat as "Already occurred" and follow that process.</div>
+      </div>
+      <div class="highlight mt-12">
+        <b>Summary — 3 things to remember:</b> 1) User-centered service (trust even without proof). 2) Always choose the correct impact label. 3) Empathy first — pacify and provide best solutions.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 14: PART 2 DIVIDER ============ -->
+    <section class="slide slide-section" data-slide="14">
+      <div class="big-num">02</div>
+      <div class="label">Part Two</div>
+      <h1>SRS Skill Group<br><span class="accent">Intro</span></h1>
+      <p class="desc">Who we are, what cases we handle, and how to spot official &amp; organizational complaint emails so you can route them correctly.</p>
+    </section>
+
+    <!-- ============ SLIDE 15: SRS GROUPS ============ -->
+    <section class="slide" data-slide="15">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <div>
+          <div class="eyebrow">Who gets what</div>
+          <h2 class="subtitle">SRS Skill Groups</h2>
+        </div>
+      </div>
+      <p class="body">SRS agents receive tickets with specific additional impacts. Each group handles different risks:</p>
+      <div class="card-teal mt-8">
+        <h3 class="section" style="font-size:13px">Service_Recovery_Risk_Gov_SkillGroup</h3>
+        <div class="tag-list">
+          <span class="tag">Ethics &amp; Crimes</span>
+          <span class="tag">Child porn</span>
+          <span class="tag">Drug issues</span>
+          <span class="tag">Personal safety (murder, kidnapping, robbery, human trafficking)</span>
+          <span class="tag">Fined or sued due to Temu</span>
+          <span class="tag">Legal action / gov complaint (high risk)</span>
+        </div>
+      </div>
+      <div class="card-coral mt-8">
+        <h3 class="section" style="font-size:13px">Service_Recovery_Risk_NonGov_SkillGroup</h3>
+        <div class="tag-list">
+          <span class="tag">External complaint (non-gov) — high risk</span>
+        </div>
+      </div>
+      <div class="card-amber mt-8">
+        <h3 class="section" style="font-size:13px">Service_Recovery_Risk_Identity_SkillGroup</h3>
+        <div class="tag-list">
+          <span class="tag">Sensitive identity inquiry</span>
+          <span class="tag">Lawyer</span>
+          <span class="tag">Media / Journalist</span>
+          <span class="tag">Celebrity / KOL</span>
+          <span class="tag">Gov / Legal authority</span>
+          <span class="tag">Legal guardian</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 16: OUT-OF-SCOPE ============ -->
+    <section class="slide" data-slide="16">
+      <div class="slide-head">
+        <div class="icon-box amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+        <div>
+          <div class="eyebrow">Edge case</div>
+          <h2 class="subtitle">Ticket Outside SRS Scope?</h2>
+        </div>
+      </div>
+      <p class="body">What if you receive a ticket that doesn't fit any SRS group? For example: an <strong>external complaint medium-risk</strong> ticket, or a case the customer escalated to <strong>PIPD</strong>?</p>
+      <div class="flow mt-8">
+        <div class="flow-step"><b>Step 1:</b> Confirm with VM / Q&A coach — what is the correct additional impact, and does the ticket need to be transferred?</div>
+        <div class="flow-step"><b>If transfer is needed:</b> Edit the correct additional label, then request the in-house team to transfer. (The system may auto-transfer to the right skill group.)</div>
+        <div class="flow-step"><b>If no transfer needed:</b> Proceed with handling the ticket according to the current regulations.</div>
+      </div>
+      <div class="highlight mt-12">
+        <b>Tip:</b> When in doubt, ask the Q&A coach first. Never silently close or re-route a ticket without confirmation.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 17: EMAIL DOMAIN VERIFICATION ============ -->
+    <section class="slide" data-slide="17">
+      <div class="slide-head">
+        <div class="icon-box slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></div>
+        <div>
+          <div class="eyebrow">Spot official emails</div>
+          <h2 class="subtitle">Email Domain Verification</h2>
+        </div>
+      </div>
+      <p class="body">Key rule: <strong>Keywords + Country code domain suffixes</strong>. Most cases show both. Some show only one. If unsure, report to Q&A coach.</p>
+      <div class="grid-2 mt-8">
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Keywords to spot</h3>
+          <ul class="bullets" style="margin-top:6px">
+            <li><strong>Organization</strong> → <code>.or</code> (Japan/Korea), <code>.org</code> (international)</li>
+            <li><strong>Government</strong> → <code>.gov</code> / <code>.go</code> (Asia) / <code>.gob</code> (Spanish) / <code>.gouv</code> (France)</li>
+            <li><strong>Consumer</strong> → <code>consumer</code> / <code>consumo</code> (Italian)</li>
+            <li><strong>Protection</strong> → <code>pro</code> / <code>proc</code> / <code>procon</code> (Latin America)</li>
+            <li><strong>Protest</strong> → <code>protest</code> (EN) / <code>proteste</code> (Portuguese)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Country suffixes</h3>
+          <div class="tag-list" style="margin-top:6px">
+            <span class="tag">.it — Italy</span>
+            <span class="tag">.kr — Korea</span>
+            <span class="tag">.br — Brazil</span>
+            <span class="tag">.jp — Japan</span>
+            <span class="tag">.be — Belgium</span>
+            <span class="tag">.pl — Poland</span>
+            <span class="tag">.at — Austria</span>
+            <span class="tag">.pe — Peru</span>
+            <span class="tag">.cz — Czech Republic</span>
+            <span class="tag">.co — Colombia</span>
+            <span class="tag">.fr — France</span>
+            <span class="tag">.ph — Philippines</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-teal mt-12">
+        <p class="body" style="margin-bottom:0"><strong>How to report to Q&A coach:</strong> More actions → Create a Q&amp;A ticket → Report to Q&A coach → Others.</p>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 18: STANDARDIZED EMAIL ============ -->
+    <section class="slide" data-slide="18">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+        <div>
+          <div class="eyebrow">6 sections to look for</div>
+          <h2 class="subtitle">Standardized Email Format</h2>
+        </div>
+      </div>
+      <p class="body">Official institutional or legal complaint emails follow a <strong>fixed, structured layout</strong> with clear section headers — not plain unformatted text.</p>
+      <div class="grid-2 mt-8">
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Typical structure</h3>
+          <div class="flow" style="margin-top:6px">
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">1. Case Number</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">2. Complainant Information</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">3. Statement of Authority</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">4. Facts / Complaint Details</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">5. Legal Demands / Required Actions</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">6. Evidence Attached</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="section" style="font-size:13px">What to do for org/institutional emails</h3>
+          <div class="flow" style="margin-top:6px">
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">1. Identify as org/institutional ticket</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">2. Create legal ticket via Ticket Paoding</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">3. Search "Law firms" keywords &amp; select nodes</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">4. Confirm info &amp; create legal ticket</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">5. Send email to guide</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px">6. Tag ticket &amp; close per KB</div>
+          </div>
+        </div>
+      </div>
+      <div class="highlight mt-12">
+        <b>High-risk subject examples:</b> <code>[Case No. XXX] Formal Complaint from [Customer Name]</code> · <code>[Case No. XXX] Complaint Notice - [Institutional Name]</code> · <code>Formal Complaint: [Core Content] (Case No. XXX, [Customer Name])</code>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 19: PART 3 DIVIDER ============ -->
+    <section class="slide slide-section" data-slide="19">
+      <div class="big-num">03</div>
+      <div class="label">Part Three</div>
+      <h1>Handle Complicated<br><span class="accent">Situations</span></h1>
+      <p class="desc">Return labels, account &amp; payment issues, and how to handle reports against customer service or sellers.</p>
+    </section>
+
+    <!-- ============ SLIDE 20: RETURN LABEL BASICS ============ -->
+    <section class="slide" data-slide="20">
+      <div class="slide-head">
+        <div class="icon-box green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg></div>
+        <div>
+          <div class="eyebrow">Part 3.1</div>
+          <h2 class="subtitle">Return Label Basics</h2>
+        </div>
+      </div>
+      <p class="body">A return label helps customers send packages back through a designated carrier. There are <strong>two types</strong>:</p>
+      <div class="grid-2 mt-8">
+        <div class="card-teal">
+          <h3 class="section" style="font-size:13px">Provided by Temu</h3>
+          <ul class="bullets" style="margin-top:6px">
+            <li>Carrier: Temu</li>
+            <li>Auto-generated after after-sales request</li>
+            <li>Available instantly</li>
+          </ul>
+        </div>
+        <div class="card-amber">
+          <h3 class="section" style="font-size:13px">Provided by Merchant</h3>
+          <ul class="bullets" style="margin-top:6px">
+            <li>Carrier: Merchant-partnered</li>
+            <li>Uploaded by merchant after after-sales request</li>
+            <li>Timeline varies (see KB 3.2)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card mt-12">
+        <h3 class="section" style="font-size:13px">Which ticket to create?</h3>
+        <p class="body" style="margin-bottom:0">Decide based on the <strong>label type</strong> (Temu vs Merchant), <strong>NOT</strong> the warehouse type. Temu label → <strong>"After-Sales Related Ticket"</strong>. Merchant label → <strong>"Merchant verification ticket"</strong>.</p>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 21: RETURN LABEL FAIL ============ -->
+    <section class="slide" data-slide="21">
+      <div class="slide-head">
+        <div class="icon-box amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+        <div>
+          <div class="eyebrow">Common issue</div>
+          <h2 class="subtitle">Return Label Generation Failed</h2>
+        </div>
+      </div>
+      <p class="body">Follow the <strong>"Return label generation failure reason"</strong> shown on the Workbench:</p>
+      <div class="t-row mt-8" style="grid-template-columns:1fr">
+        <div class="t-cell head">System Issue</div>
+        <div class="t-cell">Submit information ticket <strong>"After-sales Related Ticket — Return label generation failed"</strong>. If it times out, BPO submits a Q&amp;A ticket.</div>
+      </div>
+      <div class="t-row mt-8" style="grid-template-columns:1fr">
+        <div class="t-cell head">Name / Postal / Address Issues</div>
+        <div class="t-cell"><strong>Within 24h</strong> → ask user to wait. <strong>Over 24h</strong> → If order ≤ USD 50: offer full Exceptional Compensation refund. If &gt; USD 50 or EC balance insufficient: negotiate <strong>30% refund without return</strong>; if refused, guide user to <strong>self-return</strong>.</div>
+      </div>
+      <div class="t-row mt-8" style="grid-template-columns:1fr">
+        <div class="t-cell head">Package Overweight</div>
+        <div class="t-cell">Explain &amp; ask if user accepts <strong>split returns</strong>. If yes — free label (KB 2.72). If no — negotiate 30% refund; if refused, guide self-return.</div>
+      </div>
+      <div class="t-row mt-8" style="grid-template-columns:1fr">
+        <div class="t-cell head">Home Pickup Scheduling Issue</div>
+        <div class="t-cell">Guide user to cancel current return request, start a new one, and pick another pickup time.</div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 22: HOME PICKUP & SELF-RETURN ============ -->
+    <section class="slide" data-slide="22">
+      <div class="slide-head">
+        <div class="icon-box green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
+        <div>
+          <div class="eyebrow">US Site</div>
+          <h2 class="subtitle">Home Pickup &amp; Self-Return</h2>
+        </div>
+      </div>
+      <div class="grid-2 mt-8">
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Small Item ≤ 150 lbs</h3>
+          <ul class="bullets" style="margin-top:6px">
+            <li>Tracking starts with <strong>"1Z"</strong></li>
+            <li>Residential address: <strong>$7.99 fee</strong> (deducted from refund)</li>
+            <li>Commercial address: no fee</li>
+            <li>Print label &amp; stick on package</li>
+            <li>Free returns for unused orders</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Large Item &gt; 150 lbs</h3>
+          <ul class="bullets" style="margin-top:6px">
+            <li>Tracking starts with <strong>"3"</strong></li>
+            <li>If front-end shows "Select home pickup address" → <strong>no fee</strong></li>
+            <li>No need to print label (tracking # may be needed)</li>
+            <li>Restrictions on free returns for unused orders</li>
+            <li>Address must be in reachable postal code</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-amber mt-12">
+        <h3 class="section" style="font-size:13px">Self-Return types</h3>
+        <div class="grid-3" style="grid-template-columns:1fr;margin-top:6px">
+          <div class="card-soft" style="padding:8px 10px"><strong>Basic:</strong> No platform label, no free return shipping — user pays.</div>
+          <div class="card-soft" style="padding:8px 10px"><strong>Fallback:</strong> Platform label exists but item too heavy / location out of coverage.</div>
+          <div class="card-soft" style="padding:8px 10px"><strong>Off-system:</strong> Tier 2 offers self-return solution outside standard process.</div>
+        </div>
+      </div>
+      <div class="highlight mt-12">
+        <b>Reimbursement methods:</b> Credit (all sites) · PayPal (USA, Japan, Canada, Germany, France, Italy, Spain, UK, AU, NZ) · Bank transfer (USA). Risk control users get reimbursement after warehouse confirms; C4-5 users can get advance reimbursement in transit.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 23: ACCOUNT & PAYMENT CONCEPTS ============ -->
+    <section class="slide" data-slide="23">
+      <div class="slide-head">
+        <div class="icon-box slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+        <div>
+          <div class="eyebrow">Part 3.2</div>
+          <h2 class="subtitle">Account &amp; Payment Issues</h2>
+        </div>
+      </div>
+      <div class="grid-3 mt-8">
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Order Issues</h3>
+          <p class="tiny" style="margin-top:4px"><strong>Cannot find the order:</strong> Customer can't see a specific order in their account.</p>
+        </div>
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Payment Issues</h3>
+          <p class="tiny" style="margin-top:4px"><strong>Payment failed</strong> · <strong>Duplicate charge</strong> · <strong>Bank card theft</strong> (unauthorized charges with no matching order).</p>
+        </div>
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Account Issues</h3>
+          <p class="tiny" style="margin-top:4px"><strong>Unauthorized orders / account logged in by someone else:</strong> Order in account not placed by user, or security issues (phone/email/password changed, account theft, lost device).</p>
+        </div>
+      </div>
+      <div class="card-teal mt-12">
+        <h3 class="section" style="font-size:13px">Identify the situation — 2 questions</h3>
+        <p class="body" style="margin-bottom:6px"><strong>1. Was payment authorized?</strong> Customer said "I paid" → YES. Customer said "I didn't pay", "Someone used my card", "It wasn't me" → NO.</p>
+        <p class="body" style="margin-bottom:0"><strong>2. Can the order be found under current UID?</strong> Tier 2 manually checks the Order tab — yes/no. (Even if order is in a linked account, still mark NO.)</p>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 24: ACCOUNT SITUATIONS TABLE ============ -->
+    <section class="slide" data-slide="24">
+      <div class="slide-head">
+        <div class="icon-box amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div>
+          <div class="eyebrow">Identify &amp; route</div>
+          <h2 class="subtitle">Three Situations</h2>
+        </div>
+      </div>
+      <div class="t-row mt-8" style="grid-template-columns:1.4fr 1fr 1fr">
+        <div class="t-cell head">Situation</div>
+        <div class="t-cell head">Payment authorized?</div>
+        <div class="t-cell head">Order found in UID?</div>
+
+        <div class="t-cell"><strong>1. Cannot find the order</strong></div>
+        <div class="t-cell"><span class="risk-chip risk-low">YES</span></div>
+        <div class="t-cell"><span class="risk-chip risk-high">NO</span></div>
+
+        <div class="t-cell"><strong>2. Bank card theft / unauthorized charge</strong></div>
+        <div class="t-cell"><span class="risk-chip risk-high">NO</span></div>
+        <div class="t-cell"><span class="risk-chip risk-high">NO</span></div>
+
+        <div class="t-cell"><strong>3. Unauthorized orders / account logged in by someone else</strong></div>
+        <div class="t-cell"><span class="risk-chip risk-high">NO</span></div>
+        <div class="t-cell"><span class="risk-chip risk-low">YES</span></div>
+      </div>
+      <div class="card-coral mt-12">
+        <h3 class="section" style="font-size:13px">Quick case study</h3>
+        <ul class="bullets mt-8" style="margin-top:6px">
+          <li><strong>A.</strong> "I bought shoes but can't find them in my account." → Cannot find order</li>
+          <li><strong>B.</strong> "Card stolen, $100 deducted from Temu without permission." Order can't be found. → Bank card theft</li>
+          <li><strong>C.</strong> "Someone bought a dress under my account — someone used my account!" → Unauthorized orders</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 25: HANDLING PROCEDURES ============ -->
+    <section class="slide" data-slide="25">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        <div>
+          <div class="eyebrow">Step-by-step</div>
+          <h2 class="subtitle">Handling Procedures</h2>
+        </div>
+      </div>
+      <div class="grid-2 mt-8">
+        <div class="card-teal">
+          <h3 class="section" style="font-size:13px">Cannot Find Order</h3>
+          <div class="flow" style="margin-top:6px">
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px"><b>Step 1:</b> Search by payment / currency / amount / time, OR by tracking number.</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px"><b>Step 2:</b> If found in current UID → send order card, end.</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px"><b>Step 3:</b> If guest account / different account → follow KB 4.2.5 cross-account procedures.</div>
+          </div>
+        </div>
+        <div class="card-coral">
+          <h3 class="section" style="font-size:13px">Bank Card Theft</h3>
+          <div class="flow" style="margin-top:6px">
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px"><b>Step 1:</b> Create Information Ticket <strong>[Risk Control Related Ticket / Appeal for Unknown Payment Charges]</strong>. Required: amount, time, channel, last 4 digits of card. Optional: address, UID/email, CS note, screenshot.</div>
+            <div class="flow-step" style="padding:6px 10px;border-left-width:3px"><b>Step 2:</b> Check ticket result → not unauthorized / confirmed unauthorized / uncertain → follow KB script per result.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-amber mt-12">
+        <h3 class="section" style="font-size:13px">Unauthorized Orders / Account Logged In</h3>
+        <div class="flow" style="margin-top:6px">
+          <div class="flow-step" style="padding:6px 10px;border-left-width:3px"><b>Step 1:</b> Create Information Ticket <strong>[Account Related Ticket / Account Security Scenarios]</strong> — problem type: "Orders not placed by myself."</div>
+          <div class="flow-step" style="padding:6px 10px;border-left-width:3px"><b>Step 2:</b> Check result → <strong>Situation 1</strong> (not theft) inform customer per KB · <strong>Situation 2</strong> (theft confirmed) help recover account + set 2FA · <strong>Situation 3</strong> (stolen + possible unauthorized order) PO will be refunded.</div>
+        </div>
+      </div>
+      <div class="highlight mt-12">
+        <b>Common Tier 2 mistakes:</b> Not filling required blanks correctly, attaching wrong screenshot, screenshot doesn't prove Temu charge, vague transaction time, creating info ticket without customer proof.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 26: REPORT CS / SELLER ============ -->
+    <section class="slide" data-slide="26">
+      <div class="slide-head">
+        <div class="icon-box coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div>
+          <div class="eyebrow">Part 3.3</div>
+          <h2 class="subtitle">Report CS / Seller</h2>
+        </div>
+      </div>
+      <div class="grid-2 mt-8">
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Report Customer Service</h3>
+          <p class="body">Definition: Customer clearly requests to file a complaint against CS.</p>
+          <div class="card-soft mt-8" style="margin-top:8px;padding:8px 10px">
+            <p class="tiny" style="margin-bottom:4px"><strong>Script (CS report):</strong></p>
+            <p class="tiny">"We've noted your feedback about customer service and will review and optimize our communication and service experience accordingly."</p>
+          </div>
+          <div class="card-soft" style="margin-top:6px;padding:8px 10px">
+            <p class="tiny" style="margin-bottom:4px"><strong>Script (CS at fault):</strong></p>
+            <p class="tiny">"We regret the experience didn't meet your expectations. As a valued customer, we've added a €10 credit to your Temu account."</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="section" style="font-size:13px">Report Seller</h3>
+          <ul class="bullets" style="margin-top:6px">
+            <li>Selling a specific product → KB 4.1.2.7</li>
+            <li>Order-related issue (logistics/after-sales) → send apology script</li>
+            <li><strong>Merchant insulted user</strong> → Paoding [Sellers] → [File complaint against merchant/CS]. Check definitions: abusive, threatening, mocking language.</li>
+          </ul>
+          <div class="card-soft mt-8" style="margin-top:8px;padding:8px 10px">
+            <p class="tiny" style="margin-bottom:0"><strong>Insult verified:</strong> Send apology script + inform of regulatory actions. <strong>Not verified:</strong> Apologize + offer to monitor seller (20% coupon as EC if user insists).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 27: PART 4 DIVIDER ============ -->
+    <section class="slide slide-section" data-slide="27">
+      <div class="big-num">04</div>
+      <div class="label">Part Four</div>
+      <h1>Processing &amp;<br><span class="accent">Resolution SOP</span></h1>
+      <p class="desc">How to receive cases, what to do when stuck, how to locate complicated situations, and how to properly close tickets.</p>
+    </section>
+
+    <!-- ============ SLIDE 28: RECEIVE CASES ============ -->
+    <section class="slide" data-slide="28">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>
+        <div>
+          <div class="eyebrow">When you receive a case</div>
+          <h2 class="subtitle">Q&amp;A Confirmation Rules</h2>
+        </div>
+      </div>
+      <p class="body">Q&amp;A tickets are generated for all SRS tickets — but only <strong>some</strong> need Q&amp;A coach confirmation before offering a solution.</p>
+      <div class="t-row mt-8" style="grid-template-columns:1.2fr 1.8fr 0.8fr">
+        <div class="t-cell head">Skill Group</div>
+        <div class="t-cell head">Additional Impact</div>
+        <div class="t-cell head">Confirm?</div>
+
+        <div class="t-cell">Risk_Gov</div>
+        <div class="t-cell">Ethics &amp; Crimes · Fined or sued due to Temu</div>
+        <div class="t-cell"><span class="risk-chip risk-high">YES</span></div>
+
+        <div class="t-cell">Risk_Gov</div>
+        <div class="t-cell">Legal action / complaint to gov authorities (high risk)</div>
+        <div class="t-cell"><span class="risk-chip risk-low">NO</span></div>
+
+        <div class="t-cell">Risk_NonGov</div>
+        <div class="t-cell">External complaint (non-gov) — high risk</div>
+        <div class="t-cell"><span class="risk-chip risk-low">NO</span></div>
+
+        <div class="t-cell">Risk_Identity</div>
+        <div class="t-cell">Sensitive identity inquiry (all types)</div>
+        <div class="t-cell"><span class="risk-chip risk-high">YES</span></div>
+      </div>
+      <div class="highlight mt-12">
+        <b>Supervisor tips:</b> Introduce yourself as "This is XXX, a Supervisor from Temu Customer Service Team." All your emails require in-house approval — actively check your buckets so approvals aren't declined.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 29: STUCK AT ONE POINT ============ -->
+    <section class="slide" data-slide="29">
+      <div class="slide-head">
+        <div class="icon-box amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div>
+          <div class="eyebrow">When cases stall</div>
+          <h2 class="subtitle">Stuck at One Point</h2>
+        </div>
+      </div>
+      <p class="body">SRS cases can take days or even up to a month — but customers are always in a hurry. Here's how to handle the pressure:</p>
+      <div class="compare mt-8">
+        <div class="compare-col" style="border-top:4px solid var(--green-600)">
+          <h4 style="color:var(--green-600)">DOs</h4>
+          <ul class="bullets check" style="margin-top:6px">
+            <li>If inhouse has intervened and no solution yet, contact in-house Q&amp;A / VM and check if a <strong>reassurance email</strong> can be sent.</li>
+            <li>If Q&amp;A ticket <strong>times out</strong>, urge the Q&amp;A ticket.</li>
+            <li>If no Q&amp;A coach/in-house guidance is needed but the user keeps urging while verification is in progress, contact in-house to determine how to proceed.</li>
+          </ul>
+        </div>
+        <div class="compare-col" style="border-top:4px solid var(--red-600)">
+          <h4 style="color:var(--red-600)">DON'Ts</h4>
+          <ul class="bullets x" style="margin-top:6px">
+            <li>Do <strong>NOT</strong> send 2 consecutive reassurance emails.</li>
+            <li>If inhouse has intervened: do <strong>NOT</strong> send reassurance email without approval, do <strong>NOT</strong> reply to user before getting instructions.</li>
+            <li>Do <strong>NOT</strong> apply "no need to respond" — this may cause you to miss updates since no countdown will be triggered.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 30: LOCATE & CLOSE ============ -->
+    <section class="slide" data-slide="30">
+      <div class="slide-head">
+        <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
+        <div>
+          <div class="eyebrow">Accuracy &amp; closure</div>
+          <h2 class="subtitle">Locate &amp; Close Tickets</h2>
+        </div>
+      </div>
+      <div class="card-teal mt-8">
+        <h3 class="section" style="font-size:13px">How to locate complicated situations accurately</h3>
+        <ol class="bullets" style="margin-top:6px;list-style:none">
+          <li style="padding-left:0"><strong>1. Review all workbench info:</strong> chat history (ticket creation + most recent message; AI summaries are reference only), hotline call text transcripts (listen to recording if unsure), complete ticket flow (Q&amp;A tickets, info tickets, first-line notes), activity / payment / after-sales / logistics / order item details.</li>
+          <li style="padding-left:0"><strong>2. Organize issues &amp; demands chronologically.</strong> If timeline is long, list requests' development.</li>
+          <li style="padding-left:0"><strong>3. Refer to issues &amp; demands review</strong>, use KB or Paoding to find solutions one by one. Verify with relevant department if there are inconsistencies.</li>
+          <li style="padding-left:0"><strong>4. Make sure your email response doesn't miss any issues.</strong></li>
+        </ol>
+      </div>
+      <div class="card-coral mt-12">
+        <h3 class="section" style="font-size:13px">Closure ticket requirements</h3>
+        <p class="body">Marking <strong>"solved-yes"</strong> directly closes the ticket. Some tickets require VM / Q&amp;A coach instructions before closing:</p>
+        <div class="grid-3 mt-8" style="grid-template-columns:1fr">
+          <div class="card-soft" style="padding:8px 10px"><strong>Risk_Gov (Ethics/Fined/Legal):</strong> YES, Q&amp;A confirmation required.</div>
+          <div class="card-soft" style="padding:8px 10px"><strong>Risk_Identity:</strong> YES, Q&amp;A confirmation required.</div>
+          <div class="card-soft" style="padding:8px 10px"><strong>Risk_NonGov (high risk):</strong> NO — but if case has <strong>valid proof</strong> (relevant proof EC, lawsuit documents), don't close directly. Report to inhouse first.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 31: PART 5 - CASE ANALYSIS ============ -->
+    <section class="slide slide-section" data-slide="31">
+      <div class="big-num">05</div>
+      <div class="label">Part Five</div>
+      <h1>Case Analysis<br><span class="accent">Example</span></h1>
+      <p class="desc">A real-world CEO escalation with multiple issues. Watch how we break down issues, demands, and solutions.</p>
+    </section>
+
+    <!-- ============ SLIDE 32: CASE ANALYSIS ============ -->
+    <section class="slide" data-slide="32">
+      <div class="slide-head">
+        <div class="icon-box coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <div>
+          <div class="eyebrow">Real example</div>
+          <h2 class="subtitle">Report to CEO &amp; Multiple Issues</h2>
+        </div>
+      </div>
+      <p class="body">User response on EC to non-government (high-risk) ticket <strong>1773735134052459</strong>. Identify the issues:</p>
+      <div class="card-coral mt-8">
+        <h3 class="section" style="font-size:13px">Issues identified</h3>
+        <ol class="bullets" style="margin-top:6px;list-style:none">
+          <li style="padding-left:0"><strong>1. General:</strong> Complaint about Temu customer service.</li>
+          <li style="padding-left:0"><strong>2. Logistics - Pickup:</strong> Packages always sent to different pickup points.</li>
+          <li style="padding-left:0"><strong>3. After-sale - Return label:</strong> Package doesn't fit into the return locker.</li>
+          <li style="padding-left:0"><strong>4. After-sale - Self-return:</strong> Peyia Post Office staff said the package likely can't be returned due to address issues.</li>
+        </ol>
+        <p class="body" style="margin-top:8px"><strong>Demand:</strong> Return and refund.</p>
+      </div>
+      <div class="card-teal mt-12">
+        <h3 class="section" style="font-size:13px">Solutions — one by one</h3>
+        <div class="t-row mt-8" style="grid-template-columns:1.4fr 1.6fr">
+          <div class="t-cell head">Issue</div>
+          <div class="t-cell head">Solution</div>
+          <div class="t-cell">1. CS complaint</div>
+          <div class="t-cell">Apologize, compensate, inform how to get English service.</div>
+          <div class="t-cell">2. Pickup point issue</div>
+          <div class="t-cell">Block carrier &amp; guide user to contact carrier for home delivery.</div>
+          <div class="t-cell">3. Return locker too small</div>
+          <div class="t-cell">Suggest self-return; inform shipping fee reimbursement via Temu credit.</div>
+          <div class="t-cell">4. Self-return address issue</div>
+          <div class="t-cell">Confirm the return warehouse address.</div>
+        </div>
+      </div>
+      <div class="highlight mt-12">
+        <b>Compensation ask:</b> Customer wanted €100 for wasted time. <strong>Correct answer: B</strong> — €100 is too much, offer €15 first; if rejected, reach out to inhouse.
+      </div>
+    </section>
+
+    <!-- ============ SLIDE 33: QUIZ START ============ -->
+    <section class="slide slide-section" data-slide="33" id="quiz-start">
+      <div class="big-num">Q</div>
+      <div class="label">Test Yourself</div>
+      <h1>Final Quiz<br><span class="accent">15 Questions</span></h1>
+      <p class="desc">Tap the best answer for each question. You'll get instant feedback and a final score at the end.</p>
+      <div class="row mt-16" style="justify-content:center">
+        <button class="btn btn-primary" id="start-quiz-btn" style="padding:14px 24px;font-size:15px">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start Quiz
+        </button>
+      </div>
+    </section>
+
+    <!-- Quiz question slides will be injected here by JS -->
+    <div id="quiz-container"></div>
+
+    <!-- ============ SLIDE: QUIZ RESULT ============ -->
+    <section class="slide" data-slide="result" id="quiz-result" style="display:none">
+      <div style="margin:auto;width:100%;max-width:480px;text-align:center">
+        <div class="eyebrow" style="justify-content:center">Your Result</div>
+        <div class="result-ring" id="result-ring">
+          <span id="result-percent">0%</span>
+        </div>
+        <div class="result-score" id="result-score">0/15</div>
+        <p class="result-msg" id="result-msg">Take the quiz to see your score.</p>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="retry-quiz-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            Retry Quiz
+          </button>
+          <button class="btn btn-secondary" id="review-slides-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            Review Slides
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /slide-stack -->
+
+  <!-- Bottom navigation bar -->
+  <div id="nav-bar">
+    <button id="prev-btn" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      Prev
+    </button>
+    <div id="progress-wrap">
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+      <div id="slide-counter"><b id="cur-slide">1</b> / <span id="tot-slide">1</span></div>
+    </div>
+    <button id="next-btn">
+      Next
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ============ QUIZ DATA ============
+const QUIZ = [
+  {
+    q: "A customer says: \"If you don't refund me, my husband will kill me!\" Which label fits?",
+    ctx: "Personal threat mentioned during the session.",
+    opts: [
+      "External complaint (non-gov) — high risk",
+      "Ethics & Crimes — Personal safety issue",
+      "Human Injury (high risk)",
+      "Sensitive identity inquiry"
+    ],
+    correct: 1,
+    why: "Ethics & Crimes covers personal safety issues like murder, kidnapping, robbery, and human trafficking. A direct threat to life fits here."
+  },
+  {
+    q: "A user writes: \"I am a lawyer and a law professor.\" Which label should you apply?",
+    ctx: "User identifies themselves by profession.",
+    opts: [
+      "Sensitive identity inquiry — Lawyer inquiry",
+      "Legal action or complaint to government authorities",
+      "External complaint (non-gov)",
+      "Fined or sued due to Temu issues"
+    ],
+    correct: 0,
+    why: "Lawyers are part of the sensitive-identity category. Apply 'Sensitive identity inquiry — Lawyer inquiry' regardless of whether the user is currently active or formerly in the role."
+  },
+  {
+    q: "Customer: \"I called the police yesterday and here's my police record.\" What risk level for legal action / gov complaint?",
+    ctx: "Specific authorities + clear evidence provided.",
+    opts: ["Low risk", "Medium risk", "High risk", "No label needed"],
+    correct: 2,
+    why: "High risk applies when the customer mentions specific authorities, provides clear timelines, supporting evidence (police records, case numbers), or formal legal documents."
+  },
+  {
+    q: "Customer: \"I'll get a lawyer.\" What risk level?",
+    ctx: "Only expresses intention, no specifics.",
+    opts: ["High risk", "Medium risk", "Low risk", "No label needed"],
+    correct: 1,
+    why: "Medium risk applies when the customer only expresses an intention to seek help from authorities — without specific authorities, clear timelines, or supporting evidence."
+  },
+  {
+    q: "Customer: \"The cup exploded and injured my foot — it's bleeding! I'll post this on Instagram!\" What label?",
+    ctx: "Visible injury + external complaint intent.",
+    opts: [
+      "Human Injury (medium risk)",
+      "Human Injury (high risk) — upgraded due to external complaint intent",
+      "External complaint (non-gov) — high risk",
+      "Property damage (high risk)"
+    ],
+    correct: 1,
+    why: "Visible bleeding = physical injury. Combined with external complaint intent (Instagram), upgrade from medium risk to high risk."
+  },
+  {
+    q: "Customer: \"Your coffee maker ruined my kitchen — costs $800 to renovate!\" What label?",
+    ctx: "Property damage with claimed amount.",
+    opts: [
+      "Property damage (medium risk)",
+      "Property damage (high risk) — amount ≥ USD 600",
+      "Human Injury (high risk)",
+      "Ethics & Crimes"
+    ],
+    correct: 1,
+    why: "Claimed amount is $800 (≥ USD 600), so it's Property damage (high risk). The damage is to the customer's private property (kitchen), caused by a Temu product."
+  },
+  {
+    q: "Customer: \"I already contacted a TV station to expose this.\" (No screenshot provided) What label?",
+    ctx: "Specific high-impact channel, no evidence.",
+    opts: [
+      "External complaint (non-gov) — low risk",
+      "External complaint (non-gov) — medium risk",
+      "External complaint (non-gov) — high risk",
+      "External complaint (non-gov) — no label"
+    ],
+    correct: 2,
+    why: "Traditional media (TV stations, newspapers) carry higher risk. Even without a screenshot, naming a specific high-impact channel = high risk."
+  },
+  {
+    q: "Customer: \"I'm going to file a complaint against you.\" What label?",
+    ctx: "General intention, no specific channel or timeline.",
+    opts: [
+      "External complaint (non-gov) — high risk",
+      "External complaint (non-gov) — medium risk",
+      "External complaint (non-gov) — low risk",
+      "No additional impact"
+    ],
+    correct: 2,
+    why: "General intention to seek external resolution, without mentioning a specific complaint channel or a clear timeline, = low risk."
+  },
+  {
+    q: "A lawyer bought defective shoes that caused a bleeding foot. What label combo applies?",
+    ctx: "Sensitive identity + human injury (medium).",
+    opts: [
+      "Sensitive identity inquiry only",
+      "Human Injury (high risk) — sensitive identity + medium-risk injury",
+      "Ethics & Crimes",
+      "No label needed"
+    ],
+    correct: 1,
+    why: "Sensitive identity (lawyer) + Human Injury (medium risk) = upgrade to Human Injury (high risk). The combination rule says injury/property damage labels take priority."
+  },
+  {
+    q: "Which SRS skill group handles 'External complaint (non-gov) — high risk' tickets?",
+    ctx: "Recall the three SRS skill groups.",
+    opts: [
+      "Service_Recovery_Risk_Gov_SkillGroup",
+      "Service_Recovery_Risk_NonGov_SkillGroup",
+      "Service_Recovery_Risk_Identity_SkillGroup",
+      "None — these stay with Tier 1"
+    ],
+    correct: 1,
+    why: "Service_Recovery_Risk_NonGov_SkillGroup handles External complaint (non-gov) — high risk cases. Gov group handles Ethics, Fines, Legal action. Identity group handles sensitive identities."
+  },
+  {
+    q: "If the return label fails to generate due to name/postal/address issues AND it's been over 24 hours AND order is ≤ USD 50, what should you do?",
+    ctx: "Order value is small, EC balance available.",
+    opts: [
+      "Tell the user to wait another 24 hours",
+      "Offer a full Exceptional Compensation refund",
+      "Submit a Q&A ticket only",
+      "Refuse to help"
+    ],
+    correct: 1,
+    why: "For orders ≤ USD 50 with label generation failed over 24 hours, offer a full Exceptional Compensation refund. If balance insufficient or order > USD 50, negotiate 30% refund without return; if refused, guide self-return."
+  },
+  {
+    q: "Which tracking number prefix indicates a SMALL item home pickup (US site)?",
+    ctx: "Look at the first character of the tracking number.",
+    opts: ["Starts with '1Z'", "Starts with '3'", "Starts with 'UPS'", "Starts with 'US'"],
+    correct: 0,
+    why: "Small items (≤150 lbs) have tracking numbers starting with '1Z'. Large items (>150 lbs) start with '3'."
+  },
+  {
+    q: "Customer says: \"My card was stolen and $100 was deducted from Temu without my permission.\" Tier 2 cannot find the order under current UID. Which situation?",
+    ctx: "Check the payment authorized? + order found? matrix.",
+    opts: [
+      "Cannot find the order",
+      "Bank card theft / unauthorized charges",
+      "Unauthorized orders / account logged in by someone else",
+      "Duplicate charge"
+    ],
+    correct: 1,
+    why: "Payment NOT authorized (customer says 'stolen' / 'without permission') + order NOT found under current UID = Bank card theft / unauthorized charges. Create Information Ticket [Risk Control Related Ticket / Appeal for Unknown Payment Charges]."
+  },
+  {
+    q: "When can you send a reassurance email to a customer whose case is stuck?",
+    ctx: "Cases handled by SRS can take days. Know the DOs and DON'Ts.",
+    opts: [
+      "Anytime the user urges",
+      "Only after inhouse approval, never send 2 consecutive",
+      "Always apply 'no need to respond' to skip countdown",
+      "Never contact inhouse for help"
+    ],
+    correct: 1,
+    why: "If inhouse has intervened, contact in-house Q&A / VM and check if a reassurance email can be sent. Never send 2 consecutive reassurance emails. Don't apply 'no need to respond' — it may cause you to miss updates."
+  },
+  {
+    q: "When closing an 'External complaint (non-gov) — high risk' ticket with valid lawsuit documents, what should you do?",
+    ctx: "Closure rules differ per skill group.",
+    opts: [
+      "Close directly with 'solved-yes'",
+      "Don't close directly — report to inhouse first",
+      "Ask the customer for more proof",
+      "Transfer to Tier 1"
+    ],
+    correct: 1,
+    why: "Non-gov high-risk tickets with valid proof (relevant proof EC, lawsuit documents) should NOT be closed directly. Report to inhouse first. Other non-gov high-risk tickets (no proof) can be closed without Q&A confirmation."
+  }
+];
+
+// ============ STATE ============
+let currentSlide = 0;
+let slides = [];
+let quizCurrent = 0;
+let quizScore = 0;
+let quizAnswered = [];
+
+// ============ INIT ============
+function init(){
+  buildQuizSlides();
+  // Collect all slide sections (including dynamically created)
+  refreshSlideList();
+  // Wire up nav buttons
+  document.getElementById('prev-btn').addEventListener('click', () => go(currentSlide - 1));
+  document.getElementById('next-btn').addEventListener('click', () => go(currentSlide + 1));
+  document.getElementById('start-quiz-btn').addEventListener('click', () => go(currentSlide + 1));
+  document.getElementById('retry-quiz-btn').addEventListener('click', retryQuiz);
+  document.getElementById('review-slides-btn').addEventListener('click', () => go(0));
+
+  // Keyboard nav
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowRight') go(currentSlide + 1);
+    if(e.key === 'ArrowLeft') go(currentSlide - 1);
+  });
+
+  // Touch swipe
+  let startX = 0, startY = 0;
+  const stack = document.getElementById('slide-stack');
+  stack.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, {passive:true});
+  stack.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    // Only horizontal swipes (not vertical scroll)
+    if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5){
+      // Check if the active slide is scrolled to top/bottom
+      const active = slides[currentSlide];
+      if(!active) return;
+      const atTop = active.scrollTop <= 5;
+      const atBottom = active.scrollTop + active.clientHeight >= active.scrollHeight - 5;
+      // Only allow swipe if at top (for prev) or at bottom (for next)
+      if(dx < 0 && (atBottom || active.scrollHeight <= active.clientHeight)) go(currentSlide + 1);
+      else if(dx > 0 && (atTop || active.scrollHeight <= active.clientHeight)) go(currentSlide - 1);
+    }
+  }, {passive:true});
+
+  updateUI();
+}
+
+function refreshSlideList(){
+  slides = Array.from(document.querySelectorAll('.slide'));
+  document.getElementById('tot-slide').textContent = slides.length;
+}
+
+// ============ BUILD QUIZ SLIDES ============
+function buildQuizSlides(){
+  const container = document.getElementById('quiz-container');
+  const resultSlide = document.getElementById('quiz-result');
+
+  QUIZ.forEach((item, idx) => {
+    const section = document.createElement('section');
+    section.className = 'slide';
+    section.dataset.slide = 'quiz-' + idx;
+    section.innerHTML = `
+      <div class="slide-head">
+        <div class="icon-box amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
+        <div>
+          <div class="eyebrow">Question ${idx + 1} of ${QUIZ.length}</div>
+          <h2 class="subtitle">Quiz Time</h2>
+        </div>
+      </div>
+      <div class="quiz-question">${escapeHtml(item.q)}</div>
+      ${item.ctx ? `<div class="quiz-context">${escapeHtml(item.ctx)}</div>` : ''}
+      <div class="quiz-options" id="opts-${idx}">
+        ${item.opts.map((o, i) => `
+          <button class="quiz-opt" data-idx="${i}">
+            <span class="opt-letter">${String.fromCharCode(65 + i)}</span>
+            <span>${escapeHtml(o)}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="fb-${idx}"></div>
+      <div class="row mt-12" style="justify-content:space-between;align-items:center">
+        <span class="tiny" id="score-${idx}">Score: ${quizScore}/${QUIZ.length}</span>
+        <button class="btn btn-primary" id="next-q-${idx}" style="display:none">
+          ${idx < QUIZ.length - 1 ? 'Next Question' : 'See Results'}
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+    `;
+    container.appendChild(section);
+  });
+
+  // Move result slide to end (it's already in DOM but at top — let's keep it where it is and reorder later via JS)
+  // Actually, let's just append it at the end of the container so order is correct
+  if(resultSlide) container.appendChild(resultSlide);
+
+  // Wire up quiz buttons
+  QUIZ.forEach((item, idx) => {
+    const optsEl = document.getElementById('opts-' + idx);
+    optsEl.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => handleAnswer(idx, parseInt(btn.dataset.idx)));
+    });
+    const nextBtn = document.getElementById('next-q-' + idx);
+    nextBtn.addEventListener('click', () => {
+      if(idx < QUIZ.length - 1) go(currentSlide + 1);
+      else showResult();
+    });
+  });
+}
+
+function handleAnswer(qIdx, optIdx){
+  if(quizAnswered[qIdx]) return; // already answered
+  quizAnswered[qIdx] = optIdx;
+  const item = QUIZ[qIdx];
+  const optsEl = document.getElementById('opts-' + qIdx);
+  const fbEl = document.getElementById('fb-' + qIdx);
+  const nextBtn = document.getElementById('next-q-' + qIdx);
+
+  const buttons = optsEl.querySelectorAll('.quiz-opt');
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if(i === item.correct) btn.classList.add('correct');
+    else if(i === optIdx) btn.classList.add('wrong');
+  });
+
+  const isCorrect = (optIdx === item.correct);
+  if(isCorrect) quizScore++;
+
+  fbEl.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'no');
+  fbEl.innerHTML = `
+    <strong>${isCorrect ? 'Correct!' : 'Not quite.'}</strong> ${escapeHtml(item.why)}
+  `;
+
+  // Update score display
+  const scoreEl = document.getElementById('score-' + qIdx);
+  if(scoreEl) scoreEl.textContent = `Score: ${quizScore}/${QUIZ.length}`;
+
+  nextBtn.style.display = 'inline-flex';
+
+  // Scroll feedback into view
+  setTimeout(() => fbEl.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
+}
+
+function showResult(){
+  const pct = Math.round((quizScore / QUIZ.length) * 100);
+  document.getElementById('result-score').textContent = `${quizScore} / ${QUIZ.length}`;
+  document.getElementById('result-percent').textContent = pct + '%';
+  const ring = document.getElementById('result-ring');
+  ring.style.setProperty('--p', pct + '%');
+
+  let msg = '';
+  if(pct === 100) msg = 'Perfect! You truly understand the Service Recovery Skill Group. You\'re ready to handle sensitive cases confidently.';
+  else if(pct >= 80) msg = 'Excellent work! You\'ve got a strong grasp of the SOPs. Review any missed questions and you\'ll be perfect.';
+  else if(pct >= 60) msg = 'Good effort! Revisit the slides on the topics you missed — especially the risk levels and tagging rules.';
+  else msg = 'Keep practicing! Go through the slides one more time, paying attention to the case examples and risk levels.';
+
+  document.getElementById('result-msg').textContent = msg;
+
+  // Go to result slide
+  const resultIdx = slides.length - 1;
+  go(resultIdx);
+}
+
+function retryQuiz(){
+  // Reset state
+  quizScore = 0;
+  quizAnswered = [];
+  // Reset UI
+  QUIZ.forEach((item, idx) => {
+    const optsEl = document.getElementById('opts-' + idx);
+    if(!optsEl) return;
+    optsEl.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.classList.remove('correct', 'wrong');
+      btn.disabled = false;
+    });
+    const fbEl = document.getElementById('fb-' + idx);
+    if(fbEl){ fbEl.className = 'quiz-feedback'; fbEl.innerHTML = ''; }
+    const nextBtn = document.getElementById('next-q-' + idx);
+    if(nextBtn) nextBtn.style.display = 'none';
+    const scoreEl = document.getElementById('score-' + idx);
+    if(scoreEl) scoreEl.textContent = `Score: 0/${QUIZ.length}`;
+  });
+  // Go to first quiz question (which is the slide after quiz-start)
+  const quizStartIdx = slides.findIndex(s => s.id === 'quiz-start');
+  go(quizStartIdx + 1);
+}
+
+// ============ NAVIGATION ============
+function go(target){
+  if(target < 0 || target >= slides.length) return;
+  const dir = target > currentSlide ? 1 : -1;
+  slides.forEach((s, i) => {
+    s.classList.remove('active', 'prev');
+    if(i === target) s.classList.add('active');
+    else if(i < target) s.classList.add('prev');
+  });
+  currentSlide = target;
+  // Scroll active slide to top
+  slides[target].scrollTop = 0;
+  updateUI();
+}
+
+function updateUI(){
+  const cur = currentSlide + 1;
+  const tot = slides.length;
+  document.getElementById('cur-slide').textContent = cur;
+  document.getElementById('tot-slide').textContent = tot;
+  document.getElementById('progress-fill').style.width = (cur / tot * 100) + '%';
+  document.getElementById('prev-btn').disabled = (currentSlide === 0);
+  document.getElementById('next-btn').disabled = (currentSlide === slides.length - 1);
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Start the app
+init();
+</script>
+</body>
+</html>
